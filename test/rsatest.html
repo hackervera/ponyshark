@@ -1,0 +1,26 @@
+<SCRIPT src="../pidcrypt.js"></SCRIPT>
+<SCRIPT src="../pidcrypt_util.js"></SCRIPT>
+<SCRIPT src="../asn1.js"></SCRIPT>
+<SCRIPT src="../jsbn.js"></SCRIPT>
+<SCRIPT src="../rng.js"></SCRIPT>
+<SCRIPT src="../prng4.js"></SCRIPT>
+<SCRIPT src="../rsa.js"></SCRIPT>
+<SCRIPT src="../genkey.js"></SCRIPT>
+<SCRIPT src="../rijndael.js"></SCRIPT>
+<SCRIPT src="../custom.js"></SCRIPT>
+<script>
+
+foo = RSAGenerate();
+
+message = "hey there";
+var bnSeskey = new BigInteger(128,1,rng);//rijndael function we use uses a 128-bit key
+var seskey = bnSeskey.toString(16);
+var encryptedMessage = byteArrayToHex(rijndaelEncrypt(message, hexToByteArray(seskey), 'ECB'));
+
+encryptedKey = RSAEncrypt(seskey, foo.n);
+
+decryptedKey = RSADecrypt(encryptedKey, foo.n, foo.d);
+
+decryptedMessage = byteArrayToString(rijndaelDecrypt(hexToByteArray(encryptedMessage), hexToByteArray(seskey), 'ECB'));
+console.log(decryptedMessage);
+</script>
