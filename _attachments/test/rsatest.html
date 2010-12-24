@@ -1,0 +1,45 @@
+<script src="/_utils/script/jquery.js?1.4.2"></script> 
+<script src="/_utils/script/jquery.couch.js?0.11.0"></script> 
+<script src="https://github.com/couchapp/couchapp/raw/master/vendor/_attachments/jquery.couch.app.js"></script> 
+<SCRIPT src="pidcrypt.js"></SCRIPT>
+<SCRIPT src="pidcrypt_util.js"></SCRIPT>
+<SCRIPT src="asn1.js"></SCRIPT>
+<SCRIPT src="jsbn.js"></SCRIPT>
+<SCRIPT src="rng.js"></SCRIPT>
+<SCRIPT src="prng4.js"></SCRIPT>
+<SCRIPT src="rsa.js"></SCRIPT>
+<SCRIPT src="genkey.js"></SCRIPT>
+<SCRIPT src="rijndael.js"></SCRIPT>
+<SCRIPT src="custom.js"></SCRIPT>
+<script>
+
+foo = RSAGenerate();
+
+message = "Finally, Email That Doesn’t Dog You!Tired of webmail that parties like it’s 1999? Get Bigstring, fully integrated and media-rich email for the 21st century. With more features than you can shake a stick at, Bigstring isn’t just a giant leap over standard webmail accounts—it’s the next big thing in communication. Check out these cool features.Big Brother Is Watching, Bigstring Is Watching Your BackUntil now, you’ve been the person with the least control over your emails because, after you send them, they can be stored and scanned in more places than you can imagine. Do you want anyone to permanently store your messages? Do you want your words to possibly live in infamy without your knowledge? Take back control with BigString, your virtual email shredder.Say Sayonara to Sender RemorsShift control from the recipient to YOU. BigString grants the luxury of second thoughts, the power to limit message viewings, and the choice to delay email transmission.";
+var bnSeskey = new BigInteger(128,1,rng);//rijndael function we use uses a 128-bit key
+var seskey = bnSeskey.toString(16);
+var encryptedMessage = byteArrayToHex(rijndaelEncrypt(message, hexToByteArray(seskey), 'ECB'));
+
+encryptedKey = RSAEncrypt(seskey, foo.n);
+
+decryptedKey = RSADecrypt(encryptedKey, foo.n, foo.d);
+
+decryptedMessage = byteArrayToString(rijndaelDecrypt(hexToByteArray(encryptedMessage), hexToByteArray(seskey), 'ECB'));
+console.log(decryptedMessage);
+doc = {message:encryptedMessage};
+$.couch.app(function(app) {
+  app.db.saveDoc(doc,{
+    success:function(baz){
+      console.log(baz);
+      app.db.openDoc(baz.id, {
+        success:function(ble){
+          console.log(ble);
+          flooze = byteArrayToString(rijndaelDecrypt(hexToByteArray(ble.message), hexToByteArray(seskey), 'ECB'));
+          console.log(flooze);
+        }
+      });
+    }
+  });
+});
+
+</script>
